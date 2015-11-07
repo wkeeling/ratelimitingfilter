@@ -66,6 +66,7 @@ class RateLimitingHandlerTest(TestCase):
 
     def _emit_twenty_records_over_two_seconds(self, handler):
         mock_record = Mock()
+        mock_record.msg = 'tests message'
 
         for _ in range(20):
             handler.emit(mock_record)
@@ -79,7 +80,7 @@ class RateLimitingHandlerTest(TestCase):
 
         for _ in range(30):
             mock_record = Mock()
-            mock_record.msg = 'test message'
+            mock_record.msg = 'tests message'
             handler.emit(mock_record)
             time.sleep(0.1)
 
