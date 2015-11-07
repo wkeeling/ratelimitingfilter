@@ -14,7 +14,8 @@ class RateLimitingHandler(logging.Handler):
 
     def __init__(self, target, rate=1, per=30, burst=1):
         """
-        Create an instance of the RateLimitingHandler.
+        Create an instance of the RateLimitingHandler allowing a default rate of 1 record
+        per second when just the target argument on its own is supplied.
 
         :param target: The target handler which will receive records after rate limiting.
         :param rate: The number of records to restrict to, per the specified time interval. Default 1.
