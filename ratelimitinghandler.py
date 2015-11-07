@@ -1,4 +1,5 @@
 import logging
+import os
 from time import time
 
 
@@ -9,7 +10,7 @@ class RateLimitingHandler(logging.Handler):
 
         self._target = target
         self._rate = rate
-        self._per = per
+        self._per = per or 1
         self._burst = burst
         self._allowance = burst
         self._limited = 0
@@ -29,7 +30,12 @@ class RateLimitingHandler(logging.Handler):
             # Rate limit
             self._limited += 1
         else:
+            if self._limited > 0:
+                record.msg += '{linesep}... {num} additional messages suppressed'.format(linesep=os.linesep,
+                                                                                                  num=self._limited)
             self._target.emit(record)
+
+            self._limited = 0
             self._allowance -= 1
 
 
