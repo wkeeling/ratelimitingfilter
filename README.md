@@ -90,7 +90,7 @@ smtp.addFilter(throttle)
 logger.error('some error occurred')
 # Can be rate limited
 logger.error('a different error occurred')
-# Will be not be rate limited
+# Will not be rate limited
 logger.error('something completely different happened')
 ```
 
@@ -105,7 +105,7 @@ config = {'match': 'auto'}
 throttle = RateLimitingFilter(rate=1, per=60, burst=1, config)
 ```
 
-The filter will then attempt to identify messages based on their content in order to work out whether to throttle them or not. It will tolerate slight differences in content when identifying messages. So for example, if error messages are being rapidly logged that are the same apart from a timestamp, or perhaps an incrementing identifier, then these messages will be treated as the same as far as rate limiting is concerned.
+The filter will then attempt to identify messages based on their content in order to figure out whether to throttle them or not. It will tolerate slight differences in content when identifying messages. So for example, if error messages are being rapidly logged that are the same apart from a timestamp, or perhaps an incrementing identifier, then these messages will be treated as the same as far as rate limiting is concerned.
 
 License
 --------
