@@ -23,12 +23,8 @@ class RateLimitingFilter(logging.Filter):
         """
         super(RateLimitingFilter, self).__init__()
 
-        self._rate = rate
-        self._per = per or 1
-        self._burst = burst
-        self._allowance = burst
+        self._bucket = TokenBucket(rate, per, burst)
         self._limited = 0
-        self._last_check = time()
 
     def filter(self, record):
         """
@@ -41,6 +37,29 @@ class RateLimitingFilter(logging.Filter):
         :return: True if the record can be logged, False otherwise.
         """
 
+        if self._bucket.consume():
+            if self._limited > 0:
+                # Append a message to the record indicating the number of previously suppressed messages
+                record.msg += '{linesep}... {num} additional messages suppressed'.format(linesep=os.linesep,
+                                                                                         num=self._limited)
+            self._limited = 0
+            return True
+        else:
+            # Rate limit
+            self._limited += 1
+            return False
+
+
+class TokenBucket(object):
+
+    def __init__(self, rate, per, burst):
+        self._rate = rate
+        self._per = per or 1
+        self._burst = burst
+        self._allowance = burst
+        self._last_check = time()
+
+    def consume(self):
         now = time()
         delta = now - self._last_check
         self._last_check = now
@@ -51,16 +70,7 @@ class RateLimitingFilter(logging.Filter):
             self._allowance = self._burst
 
         if self._allowance < 1:
-            # Rate limit
-            self._limited += 1
-
             return False
         else:
-            if self._limited > 0:
-                # Append a message to the record indicating the number of previously suppressed messages
-                record.msg += '{linesep}... {num} additional messages suppressed'.format(linesep=os.linesep,
-                                                                                         num=self._limited)
-            self._limited = 0
             self._allowance -= 1
-
             return True
