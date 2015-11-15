@@ -1,3 +1,11 @@
-__pycache__
+# Packaging
+dist/
+build/
+*.egg-info/
+
+# Compilation
+__pycache__/
+*.py[cod]
+
+# Editor
 .idea
-*.pyc
