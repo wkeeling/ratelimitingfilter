@@ -12,7 +12,7 @@ class RateLimitingFilter(logging.Filter):
     an instance of the filter.
     """
 
-    def __init__(self, rate=1, per=30, burst=1):
+    def __init__(self, rate=1, per=30, burst=1, **kwargs):
         """
         Create an instance of the RateLimitingFilter allowing a default rate of 1 record
         every 30 seconds when no arguments are supplied.
@@ -20,11 +20,18 @@ class RateLimitingFilter(logging.Filter):
         :param rate: The number of records to restrict to, per the specified time interval. Default 1.
         :param per: The number of seconds during which 'rate' records may be sent. Default 30.
         :param burst: The maximum number of records that can be sent before rate limiting kicks in.
+        :param kwargs: Additional config options that can be passed to the filter.
         """
         super(RateLimitingFilter, self).__init__()
 
-        self._bucket = TokenBucket(rate, per, burst)
-        self._limited = 0
+        self._default_bucket = TokenBucket(rate, per, burst)
+        self._substr_buckets = {}
+        self._auto_buckets = {}
+
+        if 'match' in kwargs:
+            if kwargs['match'] != 'auto':
+                for s in kwargs['match']:
+                    self._substr_buckets[s] = TokenBucket(rate, per, burst)
 
     def filter(self, record):
         """
@@ -37,17 +44,38 @@ class RateLimitingFilter(logging.Filter):
         :return: True if the record can be logged, False otherwise.
         """
 
-        if self._bucket.consume():
-            if self._limited > 0:
+        bucket = self._bucket(record)
+
+        if not bucket:
+            return True
+
+        if bucket.consume():
+            if bucket.limited > 0:
                 # Append a message to the record indicating the number of previously suppressed messages
                 record.msg += '{linesep}... {num} additional messages suppressed'.format(linesep=os.linesep,
-                                                                                         num=self._limited)
-            self._limited = 0
+                                                                                         num=bucket.limited)
+            bucket.limited = 0
             return True
         else:
             # Rate limit
-            self._limited += 1
+            bucket.limited += 1
             return False
+
+    def _bucket(self, record):
+        bucket = None
+
+        if self._substr_buckets:
+            # Locate the relevant token bucket by matching the substrings against the message
+            for substr in self._substr_buckets:
+                if substr in record.msg:
+                    bucket = self._substr_buckets[substr]
+                    break
+        elif self._auto_buckets:
+            pass
+        else:
+            bucket = self._default_bucket
+
+        return bucket  # May be None which implies no filtering
 
 
 class TokenBucket(object):
@@ -58,6 +86,7 @@ class TokenBucket(object):
         self._burst = burst
         self._allowance = burst
         self._last_check = time()
+        self.limited = 0
 
     def consume(self):
         now = time()

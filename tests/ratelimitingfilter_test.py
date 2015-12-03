@@ -83,3 +83,28 @@ class RateLimitingFilterTest(TestCase):
         self.assertEqual(len(filtered), 6)
         self.assertTrue(filtered[4].msg.endswith(os.linesep + '... 6 additional messages suppressed'))
         self.assertTrue(filtered[5].msg.endswith(os.linesep + '... 9 additional messages suppressed'))
+
+    def test_should_rate_limit_messages_matching_substring(self):
+        config = {'match': ['rate limited']}
+        f = RateLimitingFilter(rate=1, per=1, burst=1, **config)
+
+        mock_matching_record = Mock()
+        mock_matching_record.msg = 'a rate limited test message'
+
+        mock_non_matching_record = Mock()
+        mock_non_matching_record.msg = 'a different test message'
+
+        result = []
+
+        for _ in range(20):
+            if f.filter(mock_matching_record):
+                result.append(mock_matching_record.msg)  # Only 2 of these get logged as they match the substring
+            if f.filter(mock_non_matching_record):
+                result.append(mock_non_matching_record.msg)  # 20 of these get logged as they don't match
+            time.sleep(0.1)
+
+        self.assertEqual(len([m for m in result if 'a rate limited test message' in m]), 2)
+        self.assertEqual(result.count('a different test message'), 20)
+
+    def test_should_rate_limit_messages_automatically(self):
+        self.fail("Implement 'auto' mode")

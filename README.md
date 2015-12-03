@@ -33,13 +33,13 @@ smtp = logging.handlers.SMTPHandler(mailhost='smtp.example.com',
                                     subject='An error has occurred')
 smtp.setLevel(logging.ERROR)
 
-# Create an instance of the RateLimitingFilter, and add it to the handler
-throttle = RateLimitingFilter()
-smtp.addFilter(throttle)
-
 # Create a formatter and set it on the handler
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 smtp.setFormatter(formatter)
+
+# Create an instance of the RateLimitingFilter, and add it to the handler
+throttle = RateLimitingFilter()
+smtp.addFilter(throttle)
 
 # Add the handler to the logger
 logger.addHandler(smtp)
@@ -83,7 +83,7 @@ You can pass a list of substrings to the `RateLimitingFilter` which it will use 
 ```
 config = {'match': ['some error', 'a different error']}
 
-throttle = RateLimitingFilter(rate=1, per=60, burst=1, config)
+throttle = RateLimitingFilter(rate=1, per=60, burst=1, **config)
 smtp.addFilter(throttle)
 
 # Can be rate limited
@@ -102,10 +102,10 @@ You can let the `RateLimitingFilter` automatically throttle messages by setting 
 
 ```
 config = {'match': 'auto'}
-throttle = RateLimitingFilter(rate=1, per=60, burst=1, config)
+throttle = RateLimitingFilter(rate=1, per=60, burst=1, **config)
 ```
 
-The filter will then attempt to identify messages based on their content in order to figure out whether to throttle them or not. It will tolerate slight differences in content when identifying messages. So for example, if error messages are being rapidly logged that are the same apart from a timestamp, or perhaps an incrementing identifier, then these messages will be treated as the same as far as rate limiting is concerned.
+The filter will then attempt to identify messages based on their content in order to figure out whether to throttle them or not. It will tolerate slight differences in content when identifying messages. So for example, if error messages are being rapidly logged that are the same apart from a timestamp, or perhaps an incrementing id, then these messages will be treated as the same as far as rate limiting is concerned.
 
 License
 --------
