@@ -18,7 +18,7 @@ $ python setup.py install
 
 A typical use case may be to throttle error notification emails sent by the `logging.handlers.SMTPHandler`. Here's an example of how you might set it up:
 
-```
+```python
 import logging.handlers
 import time
 
@@ -54,7 +54,7 @@ Creating an instance of the `RateLimitingFilter` without any arguments like in t
 
 You can customize the flow rate by supplying your own values for the `rate`, `per` and `burst` attributes. For example, to allow a rate of 1 message every 2 minutes with a periodic burst of up to 5 messages:
 
-```
+```python
 ...
 
 throttle = RateLimitingFilter(rate=1, per=120, burst=5)
@@ -80,7 +80,7 @@ The `RateLimitingFilter` supports two ways to selectively throttle messages:
  
 You can pass a list of substrings to the `RateLimitingFilter` which it will use to match messages to apply to.
  
-```
+```python
 config = {'match': ['some error', 'a different error']}
 
 throttle = RateLimitingFilter(rate=1, per=60, burst=1, **config)
@@ -100,7 +100,7 @@ _This is an experimental feature_.
 
 You can let the `RateLimitingFilter` automatically throttle messages by setting the `match` option to `auto`.
 
-```
+```python
 config = {'match': 'auto'}
 throttle = RateLimitingFilter(rate=1, per=60, burst=1, **config)
 ```
