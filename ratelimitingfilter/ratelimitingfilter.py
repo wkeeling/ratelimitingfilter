@@ -1,3 +1,4 @@
+import difflib
 import logging
 import os
 from time import time
@@ -24,14 +25,19 @@ class RateLimitingFilter(logging.Filter):
         """
         super(RateLimitingFilter, self).__init__()
 
-        self._default_bucket = TokenBucket(rate, per, burst)
-        self._substr_buckets = {}
-        self._auto_buckets = {}
+        self._create_bucket = lambda: TokenBucket(rate, per, burst)
+        self._default_bucket = self._create_bucket()
+        self._substr_buckets = None
+        self._auto_buckets = None
 
         if 'match' in kwargs:
-            if kwargs['match'] != 'auto':
+            if kwargs['match'] == 'auto':
+                self._auto_buckets = {}
+            else:
+                self._substr_buckets = {}
                 for s in kwargs['match']:
-                    self._substr_buckets[s] = TokenBucket(rate, per, burst)
+                    # Create a new token bucket for each substring
+                    self._substr_buckets[s] = self._create_bucket()
 
     def filter(self, record):
         """
@@ -44,7 +50,7 @@ class RateLimitingFilter(logging.Filter):
         :return: True if the record can be logged, False otherwise.
         """
 
-        bucket = self._bucket(record)
+        bucket = self._bucket_for(record)
 
         if not bucket:
             return True
@@ -56,29 +62,56 @@ class RateLimitingFilter(logging.Filter):
                                                                                          num=bucket.limited)
             bucket.limited = 0
             return True
-        else:
-            # Rate limit
-            bucket.limited += 1
-            return False
 
-    def _bucket(self, record):
+        # Rate limit
+        bucket.limited += 1
+        return False
+
+    def _bucket_for(self, record):
+        if self._substr_buckets is not None:
+            return self._get_substr_bucket(record)
+        elif self._auto_buckets is not None:
+            return self._get_auto_bucket(record)
+
+        return self._default_bucket
+
+    def _get_substr_bucket(self, record):
         bucket = None
 
-        if self._substr_buckets:
-            # Locate the relevant token bucket by matching the substrings against the message
-            for substr in self._substr_buckets:
-                if substr in record.msg:
-                    bucket = self._substr_buckets[substr]
-                    break
-        elif self._auto_buckets:
-            pass
-        else:
-            bucket = self._default_bucket
+        # Locate the relevant token bucket by matching the configured substrings against the message
+        for substr in self._substr_buckets:
+            if substr in record.msg:
+                bucket = self._substr_buckets[substr]
+                break
 
         return bucket  # May be None which implies no filtering
 
+    def _get_auto_bucket(self, record):
+        bucket = None
+
+        if record.msg in self._auto_buckets:
+            # We have an exact match - there is a bucket configured for this message
+            bucket = self._auto_buckets[record.msg]
+        else:
+            # Check whether we have a partial match - whether part of the message
+            # matches against a token bucket we previously created for a similar message
+            for msg, msg_bucket in self._auto_buckets.items():
+                matcher = difflib.SequenceMatcher(None, msg, record.msg)
+                if matcher.ratio() >= 0.75:  # Might want to make the ratio threshold configurable?
+                    bucket = msg_bucket
+                    break
+            if not bucket:
+                # No match, so create a new bucket for this message
+                bucket = self._create_bucket()
+                self._auto_buckets[record.msg] = bucket
+
+        return bucket
+
 
 class TokenBucket(object):
+    """
+    An implementation of the Token Bucket algorithm.
+    """
 
     def __init__(self, rate, per, burst):
         self._rate = rate
@@ -89,6 +122,11 @@ class TokenBucket(object):
         self.limited = 0
 
     def consume(self):
+        """
+        Attempts to consume a token from the bucket based upon the current state of the bucket.
+
+        :return: True if a token can be consumed, False otherwise.
+        """
         now = time()
         delta = now - self._last_check
         self._last_check = now
@@ -100,6 +138,9 @@ class TokenBucket(object):
 
         if self._allowance < 1:
             return False
-        else:
-            self._allowance -= 1
-            return True
+
+        self._allowance -= 1
+        return True
+
+    def __repr__(self):
+        return 'TokenBucket: rate={0._rate}, per={0._per}, burst={0._burst}, allowance={0._allowance}'.format(self)

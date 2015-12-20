@@ -107,4 +107,26 @@ class RateLimitingFilterTest(TestCase):
         self.assertEqual(result.count('a different test message'), 20)
 
     def test_should_rate_limit_messages_automatically(self):
-        self.fail("Implement 'auto' mode")
+        config = {'match': 'auto'}
+        f = RateLimitingFilter(rate=1, per=1, burst=1, **config)
+
+        result = []
+
+        for i in range(20):
+            mock_varying_record = Mock()
+            mock_varying_record.msg = 'a rate limited varying message: {varying}'.format(varying=i)
+
+            mock_rate_limited_record = Mock()
+            mock_rate_limited_record.msg = 'a completely different message'
+
+            if f.filter(mock_varying_record):
+                # Only 2 of these get logged as they are considered the same message,
+                # even though they are not identical
+                result.append(mock_varying_record.msg)
+            if f.filter(mock_rate_limited_record):
+                # Only 2 of these get logged as they are the all identical
+                result.append(mock_rate_limited_record.msg)
+            time.sleep(0.1)
+
+        self.assertEqual(len([m for m in result if 'a rate limited varying message' in m]), 2)
+        self.assertEqual(len([m for m in result if 'a completely different message' in m]), 2)
