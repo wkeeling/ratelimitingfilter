@@ -7,8 +7,8 @@ logger = logging.getLogger('throttled_smtp_example')
 
 # Create an SMTPHandler
 smtp = logging.handlers.SMTPHandler(mailhost='relay.plus.net',
-                                    fromaddr='will@zifferent.com',
-                                    toaddrs='will@zifferent.com',
+                                    fromaddr='will@mailinator.com',
+                                    toaddrs='will@mailinator.com',
                                     subject='An error has occurred')
 smtp.setLevel(logging.ERROR)
 
