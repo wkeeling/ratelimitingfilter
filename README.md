@@ -55,12 +55,8 @@ Creating an instance of the `RateLimitingFilter` without any arguments like in t
 You can customize the flow rate by supplying your own values for the `rate`, `per` and `burst` attributes. For example, to allow a rate of 1 message every 2 minutes with a periodic burst of up to 5 messages:
 
 ```python
-...
-
 throttle = RateLimitingFilter(rate=1, per=120, burst=5)
 smtp.addFilter(throttle)
-
-...
 ```
 
 
