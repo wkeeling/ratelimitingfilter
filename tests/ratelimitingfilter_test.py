@@ -8,49 +8,49 @@ from ratelimitingfilter import RateLimitingFilter
 
 class RateLimitingFilterTest(TestCase):
 
-    def test_should_limit_to_one_record_per_second(self):
+    def test_limit_to_one_record_per_second(self):
         f = RateLimitingFilter(rate=1, per=1, burst=1)
 
         result = self._filter_twenty_records_over_two_seconds(f)
 
         self.assertEqual(result.count(True), 2)
 
-    def test_should_limit_to_one_record_per_second_allowing_initial_burst_of_three(self):
+    def test_limit_to_one_record_per_second_allowing_initial_burst_of_three(self):
         f = RateLimitingFilter(rate=1, per=1, burst=3)
 
         result = self._filter_twenty_records_over_two_seconds(f)
 
         self.assertEqual(result.count(True), 4)
 
-    def test_should_limit_to_one_record_per_two_seconds(self):
+    def test_limit_to_one_record_per_two_seconds(self):
         f = RateLimitingFilter(rate=1, per=2, burst=1)
 
         result = self._filter_twenty_records_over_two_seconds(f)
 
         self.assertEqual(result.count(True), 1)
 
-    def test_should_limit_to_two_records_per_second(self):
+    def test_limit_to_two_records_per_second(self):
         f = RateLimitingFilter(rate=2, per=1, burst=1)
 
         result = self._filter_twenty_records_over_two_seconds(f)
 
         self.assertEqual(result.count(True), 4)
 
-    def test_should_limit_to_two_records_per_two_seconds(self):
+    def test_limit_to_two_records_per_two_seconds(self):
         f = RateLimitingFilter(rate=2, per=2, burst=1)
 
         result = self._filter_twenty_records_over_two_seconds(f)
 
         self.assertEqual(result.count(True), 2)
 
-    def test_should_limit_to_two_records_per_two_seconds_with_initial_burst_of_three(self):
+    def test_limit_to_two_records_per_two_seconds_with_initial_burst_of_three(self):
         f = RateLimitingFilter(rate=2, per=2, burst=3)
 
         result = self._filter_twenty_records_over_two_seconds(f)
 
         self.assertEqual(result.count(True), 4)
 
-    def test_should_limit_to_no_records_per_second(self):
+    def test_limit_to_no_records_per_second(self):
         f = RateLimitingFilter(rate=0, per=0, burst=0)
 
         result = self._filter_twenty_records_over_two_seconds(f)
@@ -69,7 +69,7 @@ class RateLimitingFilterTest(TestCase):
 
         return result
 
-    def test_should_append_num_limited_records_to_message(self):
+    def test_append_num_limited_records_to_message(self):
         filtered = []
         f = RateLimitingFilter(rate=1, per=1, burst=4)
 
@@ -84,7 +84,7 @@ class RateLimitingFilterTest(TestCase):
         self.assertTrue(filtered[4].msg.endswith(os.linesep + '... 6 additional messages suppressed'))
         self.assertTrue(filtered[5].msg.endswith(os.linesep + '... 9 additional messages suppressed'))
 
-    def test_should_rate_limit_messages_matching_substring(self):
+    def test_rate_limit_messages_matching_substring(self):
         config = {'match': ['rate limited']}
         f = RateLimitingFilter(rate=1, per=1, burst=1, **config)
 
@@ -106,7 +106,7 @@ class RateLimitingFilterTest(TestCase):
         self.assertEqual(len([m for m in result if 'a rate limited test message' in m]), 2)
         self.assertEqual(result.count('a different test message'), 20)
 
-    def test_should_rate_limit_messages_automatically(self):
+    def test_rate_limit_messages_automatically(self):
         config = {'match': 'auto'}
         f = RateLimitingFilter(rate=1, per=1, burst=1, **config)
 
