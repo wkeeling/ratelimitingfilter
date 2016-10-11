@@ -1,4 +1,6 @@
+from collections import defaultdict
 import difflib
+from functools import partial
 import logging
 import os
 from time import time
@@ -25,23 +27,27 @@ class RateLimitingFilter(logging.Filter):
         """
         super(RateLimitingFilter, self).__init__()
 
-        self._create_bucket = lambda: TokenBucket(rate, per, burst)
-        self._default_bucket = self._create_bucket()
+        self.rate = rate
+        self.per = per
+        self.burst = burst
+
+        self._default_bucket = TokenBucket(rate, per, burst)
         self._substr_buckets = None
         self._auto_buckets = None
 
         if 'match' in kwargs:
             if kwargs['match'] == 'auto':
-                self._auto_buckets = {}
+                self._auto_buckets = defaultdict(partial(TokenBucket, rate, per, burst))
             else:
                 self._substr_buckets = {}
                 for s in kwargs['match']:
                     # Create a new token bucket for each substring
-                    self._substr_buckets[s] = self._create_bucket()
+                    self._substr_buckets[s] = TokenBucket(rate, per, burst)
 
     def filter(self, record):
         """
         Determines whether the supplied record should be logged based upon current rate limits.
+
         If rate limits have been reached, the record is not logged and a counter is incremented
         to indicate that the record has been throttled. The next time a record is successfully
         logged, the number of previously throttled records is appended to the end of the message.
@@ -76,36 +82,27 @@ class RateLimitingFilter(logging.Filter):
         return self._default_bucket
 
     def _get_substr_bucket(self, record):
-        bucket = None
-
         # Locate the relevant token bucket by matching the configured substrings against the message
         for substr in self._substr_buckets:
             if substr in record.msg:
-                bucket = self._substr_buckets[substr]
-                break
+                return self._substr_buckets[substr]
 
-        return bucket  # May be None which implies no filtering
+        return None  # None indicates no filtering
 
     def _get_auto_bucket(self, record):
-        bucket = None
-
         if record.msg in self._auto_buckets:
             # We have an exact match - there is a bucket configured for this message
-            bucket = self._auto_buckets[record.msg]
-        else:
-            # Check whether we have a partial match - whether part of the message
-            # matches against a token bucket we previously created for a similar message
-            for msg, msg_bucket in self._auto_buckets.items():
-                matcher = difflib.SequenceMatcher(None, msg, record.msg)
-                if matcher.ratio() >= 0.75:  # Might want to make the ratio threshold configurable?
-                    bucket = msg_bucket
-                    break
-            if not bucket:
-                # No match, so create a new bucket for this message
-                bucket = self._create_bucket()
-                self._auto_buckets[record.msg] = bucket
+            return self._auto_buckets[record.msg]
 
-        return bucket
+        # Check whether we have a partial match - whether part of the message
+        # matches against a token bucket we previously created for a similar message
+        for msg, bucket in self._auto_buckets.items():
+            matcher = difflib.SequenceMatcher(None, msg, record.msg)
+            if matcher.ratio() >= 0.75:  # Might want to make the ratio threshold configurable?
+                return bucket
+
+        # No match, so create a new bucket for this message
+        return self._auto_buckets[record.msg]
 
 
 class TokenBucket(object):
@@ -143,4 +140,4 @@ class TokenBucket(object):
         return True
 
     def __repr__(self):
-        return 'TokenBucket: rate={0._rate}, per={0._per}, burst={0._burst}, allowance={0._allowance}'.format(self)
+        return 'TokenBucket(rate={0._rate}, per={0._per}, burst={0._burst})'.format(self)
