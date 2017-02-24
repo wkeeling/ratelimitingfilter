@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 from unittest.case import TestCase
@@ -130,3 +131,16 @@ class RateLimitingFilterTest(TestCase):
 
         self.assertEqual(len([m for m in result if 'a rate limited varying message' in m]), 2)
         self.assertEqual(len([m for m in result if 'a completely different message' in m]), 2)
+
+    def test_log_exception(self):
+        logger = logging.getLogger('test')
+        handler = logging.StreamHandler()
+        throttle = RateLimitingFilter(rate=1, per=1, burst=1)
+        handler.addFilter(throttle)
+        logger.addHandler(handler)
+
+        try:
+            logger.error('First')
+            raise RuntimeError('Expected exception')
+        except RuntimeError as e:
+            logger.exception(e)  # Should be throttled
