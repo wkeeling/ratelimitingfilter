@@ -1,1 +1,1 @@
-from ratelimitingfilter.ratelimitingfilter import RateLimitingFilter
+from ratelimitingfilter import RateLimitingFilter

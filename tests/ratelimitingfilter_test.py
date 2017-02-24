@@ -1,13 +1,17 @@
 import logging
 import os
-import time
 from unittest.case import TestCase
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from ratelimitingfilter import RateLimitingFilter
 
 
 class RateLimitingFilterTest(TestCase):
+    def setUp(self):
+        patcher = patch('ratelimitingfilter.ratelimitingfilter.time')
+        self.mock_time = patcher.start()
+        self.addCleanup(patcher.stop)
+        self.mock_time.return_value = 0
 
     def test_limit_to_one_record_per_second(self):
         f = RateLimitingFilter(rate=1, per=1, burst=1)
@@ -66,7 +70,7 @@ class RateLimitingFilterTest(TestCase):
 
         for _ in range(20):
             result.append(f.filter(mock_record))
-            time.sleep(0.1)
+            self.mock_time.return_value += 0.1
 
         return result
 
@@ -79,7 +83,7 @@ class RateLimitingFilterTest(TestCase):
             mock_record.msg = 'test message'
             if f.filter(mock_record):
                 filtered.append(mock_record)
-            time.sleep(0.1)
+            self.mock_time.return_value += 0.1
 
         self.assertEqual(len(filtered), 6)
         self.assertTrue(filtered[4].msg.endswith(os.linesep + '... 6 additional messages suppressed'))
@@ -102,7 +106,7 @@ class RateLimitingFilterTest(TestCase):
                 result.append(mock_matching_record.msg)  # Only 2 of these get logged as they match the substring
             if f.filter(mock_non_matching_record):
                 result.append(mock_non_matching_record.msg)  # 20 of these get logged as they don't match
-            time.sleep(0.1)
+            self.mock_time.return_value += 0.1
 
         self.assertEqual(len([m for m in result if 'a rate limited test message' in m]), 2)
         self.assertEqual(result.count('a different test message'), 20)
@@ -127,7 +131,7 @@ class RateLimitingFilterTest(TestCase):
             if f.filter(mock_rate_limited_record):
                 # Only 2 of these get logged as they are the all identical
                 result.append(mock_rate_limited_record.msg)
-            time.sleep(0.1)
+            self.mock_time.return_value += 0.1
 
         self.assertEqual(len([m for m in result if 'a rate limited varying message' in m]), 2)
         self.assertEqual(len([m for m in result if 'a completely different message' in m]), 2)
