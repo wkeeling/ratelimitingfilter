@@ -6,7 +6,7 @@ from ratelimitingfilter import RateLimitingFilter
 logger = logging.getLogger('throttled_smtp_example')
 
 # Create an SMTPHandler
-smtp = logging.handlers.SMTPHandler(mailhost='relay.plus.net',
+smtp = logging.handlers.SMTPHandler(mailhost='relay.somehost.net',
                                     fromaddr='will@mailinator.com',
                                     toaddrs='will@mailinator.com',
                                     subject='An error has occurred')
