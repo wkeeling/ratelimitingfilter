@@ -1,7 +1,7 @@
 import logging
 import os
 from unittest.case import TestCase
-from unittest.mock import Mock, patch
+from mock import Mock, patch
 
 from ratelimitingfilter import RateLimitingFilter
 
