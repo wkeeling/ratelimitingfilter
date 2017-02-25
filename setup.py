@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 setup(name='ratelimitingfilter',
-      version='0.1',
+      version='0.2',
       description='A rate limiting filter for the logging system',
       url='https://github.com/wkeeling/ratelimitingfilter',
       author='Will Keeling',
@@ -12,4 +12,5 @@ setup(name='ratelimitingfilter',
       maintainer='Will Keeling',
       maintainer_email='will@zifferent.com',
       license='MIT',
-      packages=['ratelimitingfilter'])
+      packages=['ratelimitingfilter'],
+      tests_require=['mock==2.0'])
