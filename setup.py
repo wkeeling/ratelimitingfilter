@@ -5,7 +5,7 @@ except ImportError:
 
 setup(name='ratelimitingfilter',
       version='0.2',
-      description='A rate limiting filter for the logging system',
+      description='A rate limiting filter for the Python logging system',
       url='https://github.com/wkeeling/ratelimitingfilter',
       author='Will Keeling',
       author_email='will@zifferent.com',
@@ -13,4 +13,5 @@ setup(name='ratelimitingfilter',
       maintainer_email='will@zifferent.com',
       license='MIT',
       packages=['ratelimitingfilter'],
+      keywords='logging filter SMTPHandler ratelimit throughput',
       tests_require=['mock==2.0'])
