@@ -1,5 +1,7 @@
 # RateLimitingFilter
 
+[![Build Status](https://travis-ci.org/wkeeling/ratelimitingfilter.svg?branch=master)](https://travis-ci.org/wkeeling/ratelimitingfilter)
+
 The `RateLimitingFilter` is a filter for the Python logging system that allows you to restrict the rate at which messages can pass through your logging handlers.
 
 The filter can be useful if you're using a handler such as Python's `logging.handlers.SMTPHandler` to send error notification emails. Error notification emails provide a useful means of keeping an eye on the health of a running system, but these emails have the potential to overload a mailbox if they start arriving in quick succession due to some kind of critical failure.
