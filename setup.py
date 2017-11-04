@@ -4,11 +4,11 @@ except ImportError:
     from distutils.core import setup
 
 setup(name='ratelimitingfilter',
-      version='0.4',
+      version='0.5',
       description='A rate limiting filter for the Python logging system',
       long_description=open('README.rst').read(),
       url='https://github.com/wkeeling/ratelimitingfilter',
-      download_url='https://github.com/wkeeling/ratelimitingfilter/archive/0.4.tar.gz',
+      download_url='https://github.com/wkeeling/ratelimitingfilter/archive/0.5.tar.gz',
       author='Will Keeling',
       author_email='will@zifferent.com',
       maintainer='Will Keeling',

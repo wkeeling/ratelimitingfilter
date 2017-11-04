@@ -24,6 +24,12 @@ Installing
 
 ::
 
+    $ pip install ratelimitingfilter
+
+or
+
+::
+
     $ git clone https://github.com/wkeeling/ratelimitingfilter.git
     $ cd ratelimitingfilter
     $ python setup.py install
@@ -155,6 +161,7 @@ Contributing
 
 Feedback and improvements are more than welcome. Please submit a pull
 request!
+
 https://github.com/wkeeling/ratelimitingfilter
 
 .. |Build Status| image:: https://travis-ci.org/wkeeling/ratelimitingfilter.svg?branch=master
