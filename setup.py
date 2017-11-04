@@ -3,18 +3,12 @@ try:
 except ImportError:
     from distutils.core import setup
 
-try:
-    import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
-except(IOError, ImportError):
-    long_description = open('README.md').read()
-
 setup(name='ratelimitingfilter',
-      version='0.3',
+      version='0.4',
       description='A rate limiting filter for the Python logging system',
-      long_description=long_description,
+      long_description=open('README.rst').read(),
       url='https://github.com/wkeeling/ratelimitingfilter',
-      download_url='https://github.com/wkeeling/ratelimitingfilter/archive/0.3.tar.gz',
+      download_url='https://github.com/wkeeling/ratelimitingfilter/archive/0.4.tar.gz',
       author='Will Keeling',
       author_email='will@zifferent.com',
       maintainer='Will Keeling',
