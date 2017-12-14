@@ -1,3 +1,5 @@
+from __future__ import division
+
 import logging
 import os
 from unittest.case import TestCase
@@ -62,15 +64,26 @@ class RateLimitingFilterTest(TestCase):
 
         self.assertEqual(result.count(True), 0)
 
+    def test_limit_to_two_record_per_ten_second(self):
+        f = RateLimitingFilter(rate=2, per=10)
+
+        result = self._filter_r_records_over_s_seconds(f, 20, 10)
+
+        self.assertEqual(result.count(True), 2)
+
     def _filter_twenty_records_over_two_seconds(self, f):
+        return self._filter_r_records_over_s_seconds(f, 20, 2)
+
+
+    def _filter_r_records_over_s_seconds(self, f, nb_records, nb_seconds):
         mock_record = Mock()
         mock_record.msg = 'test message'
 
         result = []
 
-        for _ in range(20):
+        for _ in range(nb_records):
             result.append(f.filter(mock_record))
-            self.mock_time.return_value += 0.1
+            self.mock_time.return_value += nb_seconds / (nb_records or 1)
 
         return result
 
