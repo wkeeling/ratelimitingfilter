@@ -61,8 +61,8 @@ You can rate-limit a logging handler simply by creating a new instance of the
 
 .. code:: python
 
-    rate_limiter = RateLimitingFilter()
-    handler.addFilter(rate_limiter)
+    ratelimit = RateLimitingFilter()
+    handler.addFilter(ratelimit)
 
 Creating an instance of the ``RateLimitingFilter`` without any arguments
 like in the example above will restrict the flow of messages to 1 every
@@ -74,8 +74,11 @@ of 1 message every 2 minutes with a periodic burst of up to 5 messages:
 
 .. code:: python
 
-    rate_limiter = RateLimitingFilter(rate=1, per=120, burst=5)
-    smtp.addFilter(rate_limiter)
+    ratelimit = RateLimitingFilter(rate=1, per=120, burst=5)
+    smtp.addFilter(ratelimit)
+
+SMTPHandler
+~~~~~~~~~~~
 
 A typical use case may be to throttle error notification emails sent by
 the ``logging.handlers.SMTPHandler``.
@@ -103,8 +106,8 @@ Here's an example of how you might set that up:
     smtp.setFormatter(formatter)
 
     # Create an instance of the RateLimitingFilter, and add it to the handler
-    rate_limiter = RateLimitingFilter()
-    smtp.addFilter(rate_limiter)
+    ratelimit = RateLimitingFilter()
+    smtp.addFilter(ratelimit)
 
     # Add the handler to the logger
     logger.addHandler(smtp)
@@ -149,8 +152,8 @@ will use to match messages to apply to.
 
     config = {'match': ['some error', 'a different error']}
 
-    rate_limiter = RateLimitingFilter(rate=1, per=60, burst=1, **config)
-    smtp.addFilter(rate_limiter)
+    ratelimit = RateLimitingFilter(rate=1, per=60, burst=1, **config)
+    smtp.addFilter(ratelimit)
 
     # Can be rate limited
     logger.error('some error occurred')
@@ -172,7 +175,7 @@ by setting the ``match`` option to ``auto``.
 .. code:: python
 
     config = {'match': 'auto'}
-    rate_limiter = RateLimitingFilter(rate=1, per=60, burst=1, **config)
+    ratelimit = RateLimitingFilter(rate=1, per=60, burst=1, **config)
 
 The filter will then attempt to identify messages based on their content
 in order to figure out whether to throttle them or not. It will tolerate
