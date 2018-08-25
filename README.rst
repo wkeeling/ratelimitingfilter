@@ -61,6 +61,10 @@ You can rate-limit a logging handler simply by creating a new instance of the
 
 .. code:: python
 
+    from ratelimitingfilter import RateLimitingFilter
+
+    ...
+
     ratelimit = RateLimitingFilter()
     handler.addFilter(ratelimit)
 
@@ -77,8 +81,8 @@ of 1 message every 2 minutes with a periodic burst of up to 5 messages:
     ratelimit = RateLimitingFilter(rate=1, per=120, burst=5)
     handler.addFilter(ratelimit)
 
-SMTPHandler
-~~~~~~~~~~~
+SMTPHandler Example
+~~~~~~~~~~~~~~~~~~~
 
 A typical use case may be to throttle error notification emails sent by
 the ``logging.handlers.SMTPHandler``.
@@ -95,10 +99,12 @@ Here's an example of how you might set that up:
     logger = logging.getLogger('throttled_smtp_example')
 
     # Create an SMTPHandler
-    smtp = logging.handlers.SMTPHandler(mailhost='smtp.example.com',
-                                        fromaddr='from@example.com',
-                                        toaddrs='to@example.com',
-                                        subject='An error has occurred')
+    smtp = logging.handlers.SMTPHandler(
+        mailhost='smtp.example.com',
+        fromaddr='from@example.com',
+        toaddrs='to@example.com',
+        subject='An error has occurred'
+    )
     smtp.setLevel(logging.ERROR)
 
     # Create a formatter and set it on the handler
