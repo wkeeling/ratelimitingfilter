@@ -9,3 +9,8 @@ __pycache__/
 
 # Editor
 .idea
+
+# Test
+.coverage
+coverage.xml
+
