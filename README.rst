@@ -1,19 +1,19 @@
 RateLimitingFilter
 ==================
 
-.. image:: image:: https://travis-ci.org/wkeeling/ratelimitingfilter.svg?branch=master
-        :target: :target: https://travis-ci.org/wkeeling/ratelimitingfilter
+.. image:: https://travis-ci.org/wkeeling/ratelimitingfilter.svg?branch=master
+        :target: https://travis-ci.org/wkeeling/ratelimitingfilter
 
 .. image:: https://codecov.io/gh/wkeeling/ratelimitingfilter/branch/master/graph/badge.svg
         :target: https://codecov.io/gh/wkeeling/ratelimitingfilter
 
-.. image:: https://img.shields.io/badge/python-2.7%2C%203.4%2C%203.5%2C%203.6%2C%203.7
+.. image:: https://img.shields.io/badge/python-2.7%2C%203.4%2C%203.5%2C%203.6%2C%203.7-blue.svg
         :target: https://pypi.python.org/pypi/ratelimitingfilter
 
 .. image:: https://img.shields.io/pypi/v/ratelimitingfilter.svg
         :target: https://pypi.python.org/ratelimitingfilter
 
-.. image:: https://https://img.shields.io/pypi/l/ratelimitingfilter.svg
+.. image:: https://img.shields.io/pypi/l/ratelimitingfilter.svg
         :target: https://pypi.python.org/ratelimitingfilter
 
 
@@ -64,9 +64,23 @@ You can rate-limit a logging handler simply by creating a new instance of the
     rate_limiter = RateLimitingFilter()
     handler.addFilter(rate_limiter)
 
+Creating an instance of the ``RateLimitingFilter`` without any arguments
+like in the example above will restrict the flow of messages to 1 every
+30 seconds.
+
+You can customize the flow rate by supplying your own values for the
+``rate``, ``per`` and ``burst`` attributes. For example, to allow a rate
+of 1 message every 2 minutes with a periodic burst of up to 5 messages:
+
+.. code:: python
+
+    rate_limiter = RateLimitingFilter(rate=1, per=120, burst=5)
+    smtp.addFilter(rate_limiter)
+
 A typical use case may be to throttle error notification emails sent by
-the ``logging.handlers.SMTPHandler``. Here's an example of how you might
-set that up:
+the ``logging.handlers.SMTPHandler``.
+
+Here's an example of how you might set that up:
 
 .. code:: python
 
@@ -99,19 +113,6 @@ set that up:
     while True:
         logger.error('An error message')
         time.sleep(2)
-
-Creating an instance of the ``RateLimitingFilter`` without any arguments
-like in the example above will restrict the flow of messages to 1 every
-30 seconds.
-
-You can customize the flow rate by supplying your own values for the
-``rate``, ``per`` and ``burst`` attributes. For example, to allow a rate
-of 1 message every 2 minutes with a periodic burst of up to 5 messages:
-
-.. code:: python
-
-    rate_limiter = RateLimitingFilter(rate=1, per=120, burst=5)
-    smtp.addFilter(rate_limiter)
 
 Advanced Usage
 --------------
