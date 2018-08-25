@@ -1,19 +1,27 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
 
-setup(name='ratelimitingfilter',
-      version='0.6',
-      description='A rate limiting filter for the Python logging system',
-      long_description=open('README.rst').read(),
-      url='https://github.com/wkeeling/ratelimitingfilter',
-      download_url='https://github.com/wkeeling/ratelimitingfilter/archive/0.6.tar.gz',
-      author='Will Keeling',
-      author_email='will@zifferent.com',
-      maintainer='Will Keeling',
-      maintainer_email='will@zifferent.com',
-      license='MIT',
-      packages=['ratelimitingfilter'],
-      keywords='logging filter SMTPHandler ratelimit throughput',
-      tests_require=['mock==2.0'])
+setup(
+    author='Will Keeling',
+    author_email='will@zifferent.com',
+    classifiers=[
+        'Development Status :: 5 - Production/Stable'
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+    ],
+    description='A rate limiting filter for the Python logging system',
+    license='MIT',
+    long_description=open('README.rst').read(),
+    keywords='ratelimitingfilter',
+    name='ratelimitingfilter',
+    packages=['ratelimitingfilter'],
+    test_suite='nose.collector',
+    tests_require=['mock==2.0'],
+    url='https://github.com/wkeeling/ratelimitingfilter',
+    version='0.6',
+)
