@@ -75,7 +75,7 @@ of 1 message every 2 minutes with a periodic burst of up to 5 messages:
 .. code:: python
 
     ratelimit = RateLimitingFilter(rate=1, per=120, burst=5)
-    smtp.addFilter(ratelimit)
+    handler.addFilter(ratelimit)
 
 SMTPHandler
 ~~~~~~~~~~~
