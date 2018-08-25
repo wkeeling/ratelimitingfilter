@@ -1,7 +1,21 @@
 RateLimitingFilter
 ==================
 
-|Build Status|
+.. image:: image:: https://travis-ci.org/wkeeling/ratelimitingfilter.svg?branch=master
+        :target: :target: https://travis-ci.org/wkeeling/ratelimitingfilter
+
+.. image:: https://codecov.io/gh/wkeeling/ratelimitingfilter/branch/master/graph/badge.svg
+        :target: https://codecov.io/gh/wkeeling/ratelimitingfilter
+
+.. image:: https://img.shields.io/badge/python-2.7%2C%203.4%2C%203.5%2C%203.6%2C%203.7
+        :target: https://pypi.python.org/pypi/ratelimitingfilter
+
+.. image:: https://img.shields.io/pypi/v/ratelimitingfilter.svg
+        :target: https://pypi.python.org/ratelimitingfilter
+
+.. image:: https://https://img.shields.io/pypi/l/ratelimitingfilter.svg
+        :target: https://pypi.python.org/ratelimitingfilter
+
 
 The ``RateLimitingFilter`` is a filter for the Python logging system
 that allows you to restrict the rate at which messages can pass through
@@ -16,8 +30,13 @@ some kind of critical failure.
 
 The ``RateLimitingFilter`` can help prevent mailbox overload by
 throttling messages based on a configurable rate, whilst allowing for
-initial bursts of messages which can be a useful indicator that
+periodic bursts of messages which can be a useful indicator that
 something somewhere has broken.
+
+Compatibility
+-------------
+
+* Python 2.7, 3.4+
 
 Installing
 ----------
@@ -37,9 +56,17 @@ or
 Usage
 -----
 
+You can rate-limit a logging handler simply by creating a new instance of the
+``RateLimitingFilter`` and adding it to the handler:
+
+.. code:: python
+
+    rate_limiter = RateLimitingFilter()
+    handler.addFilter(rate_limiter)
+
 A typical use case may be to throttle error notification emails sent by
 the ``logging.handlers.SMTPHandler``. Here's an example of how you might
-set it up:
+set that up:
 
 .. code:: python
 
@@ -62,8 +89,8 @@ set it up:
     smtp.setFormatter(formatter)
 
     # Create an instance of the RateLimitingFilter, and add it to the handler
-    throttle = RateLimitingFilter()
-    smtp.addFilter(throttle)
+    rate_limiter = RateLimitingFilter()
+    smtp.addFilter(rate_limiter)
 
     # Add the handler to the logger
     logger.addHandler(smtp)
@@ -83,8 +110,8 @@ of 1 message every 2 minutes with a periodic burst of up to 5 messages:
 
 .. code:: python
 
-    throttle = RateLimitingFilter(rate=1, per=120, burst=5)
-    smtp.addFilter(throttle)
+    rate_limiter = RateLimitingFilter(rate=1, per=120, burst=5)
+    smtp.addFilter(rate_limiter)
 
 Advanced Usage
 --------------
@@ -121,13 +148,15 @@ will use to match messages to apply to.
 
     config = {'match': ['some error', 'a different error']}
 
-    throttle = RateLimitingFilter(rate=1, per=60, burst=1, **config)
-    smtp.addFilter(throttle)
+    rate_limiter = RateLimitingFilter(rate=1, per=60, burst=1, **config)
+    smtp.addFilter(rate_limiter)
 
     # Can be rate limited
     logger.error('some error occurred')
+
     # Can be rate limited
     logger.error('a different error occurred')
+
     # Will not be rate limited
     logger.error('something completely different happened')
 
@@ -142,7 +171,7 @@ by setting the ``match`` option to ``auto``.
 .. code:: python
 
     config = {'match': 'auto'}
-    throttle = RateLimitingFilter(rate=1, per=60, burst=1, **config)
+    rate_limiter = RateLimitingFilter(rate=1, per=60, burst=1, **config)
 
 The filter will then attempt to identify messages based on their content
 in order to figure out whether to throttle them or not. It will tolerate
@@ -163,6 +192,3 @@ Feedback and improvements are more than welcome. Please submit a pull
 request!
 
 https://github.com/wkeeling/ratelimitingfilter
-
-.. |Build Status| image:: https://travis-ci.org/wkeeling/ratelimitingfilter.svg?branch=master
-   :target: https://travis-ci.org/wkeeling/ratelimitingfilter
