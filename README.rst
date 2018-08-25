@@ -11,10 +11,10 @@ RateLimitingFilter
         :target: https://pypi.python.org/pypi/ratelimitingfilter
 
 .. image:: https://img.shields.io/pypi/v/ratelimitingfilter.svg
-        :target: https://pypi.python.org/ratelimitingfilter
+        :target: https://pypi.python.org/pypi/ratelimitingfilter
 
 .. image:: https://img.shields.io/pypi/l/ratelimitingfilter.svg
-        :target: https://pypi.python.org/ratelimitingfilter
+        :target: https://pypi.python.org/pypi/ratelimitingfilter
 
 
 The ``RateLimitingFilter`` is a filter for the Python logging system
