@@ -15,7 +15,7 @@ setup(
         'Programming Language :: Python :: 3.7',
     ],
     description='A rate limiting filter for the Python logging system',
-    license='MIT license',
+    license='MIT',
     long_description=open('README.rst').read(),
     keywords='ratelimitingfilter',
     name='ratelimitingfilter',
