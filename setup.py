@@ -23,5 +23,5 @@ setup(
     test_suite='nose.collector',
     tests_require=['mock==2.0'],
     url='https://github.com/wkeeling/ratelimitingfilter',
-    version='1.1',
+    version='1.2',
 )
