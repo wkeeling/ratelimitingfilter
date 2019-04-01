@@ -71,13 +71,19 @@ class RateLimitingFilterTest(TestCase):
 
         self.assertEqual(result.count(True), 2)
 
+    def test_rate_limit_non_string(self):
+        f = RateLimitingFilter(rate=2, per=10)
+
+        result = self._filter_r_records_over_s_seconds(f, 20, 10, message=123)
+
+        self.assertEqual(result.count(True), 2)
+
     def _filter_twenty_records_over_two_seconds(self, f):
         return self._filter_r_records_over_s_seconds(f, 20, 2)
 
-
-    def _filter_r_records_over_s_seconds(self, f, nb_records, nb_seconds):
+    def _filter_r_records_over_s_seconds(self, f, nb_records, nb_seconds, message='test message'):
         mock_record = Mock()
-        mock_record.msg = 'test message'
+        mock_record.msg = message
 
         result = []
 

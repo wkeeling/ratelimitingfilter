@@ -70,8 +70,11 @@ class RateLimitingFilter(logging.Filter):
         if bucket.consume():
             if bucket.limited > 0:
                 # Append a message to the record indicating the number of previously suppressed messages
-                record.msg += '{linesep}... {num} additional messages suppressed'.format(linesep=os.linesep,
-                                                                                         num=bucket.limited)
+                record.msg = '{msg}{linesep}... {num} additional messages suppressed'.format(
+                    msg=record.msg,
+                    linesep=os.linesep,
+                    num=bucket.limited
+                )
             bucket.limited = 0
             return True
 
