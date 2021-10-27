@@ -100,6 +100,7 @@ class RateLimitingFilterTest(TestCase):
         for _ in range(30):
             mock_record = Mock()
             mock_record.msg = 'test message'
+            mock_record.getMessage.return_value = 'test message'
             if f.filter(mock_record):
                 filtered.append(mock_record)
             self.mock_time.return_value += 0.1
@@ -114,8 +115,10 @@ class RateLimitingFilterTest(TestCase):
 
         mock_matching_record = Mock()
         mock_matching_record.msg = 'a rate limited test message'
+        mock_matching_record.getMessage.return_value =  'a rate limited test message'
 
         mock_non_matching_record = Mock()
+        mock_non_matching_record.getMessage.return_value = 'a different test message'
         mock_non_matching_record.msg = 'a different test message'
 
         result = []
@@ -139,9 +142,11 @@ class RateLimitingFilterTest(TestCase):
         for i in range(20):
             mock_varying_record = Mock()
             mock_varying_record.msg = 'a rate limited varying message: {varying}'.format(varying=i)
+            mock_varying_record.getMessage.return_value =  'a rate limited varying message: {varying}'.format(varying=i)
 
             mock_rate_limited_record = Mock()
             mock_rate_limited_record.msg = 'a completely different message'
+            mock_rate_limited_record.getMessage.return_value = 'a completely different message'
 
             if f.filter(mock_varying_record):
                 # Only 2 of these get logged as they are considered the same message,
@@ -158,7 +163,8 @@ class RateLimitingFilterTest(TestCase):
     def test_log_exception(self):
         logger = logging.getLogger('test')
         handler = logging.StreamHandler()
-        throttle = RateLimitingFilter(rate=1, per=1, burst=1)
+        config = {'match': 'auto'}
+        throttle = RateLimitingFilter(rate=1, per=1, burst=1, **config)
         handler.addFilter(throttle)
         logger.addHandler(handler)
 

@@ -71,7 +71,7 @@ class RateLimitingFilter(logging.Filter):
             if bucket.limited > 0:
                 # Append a message to the record indicating the number of previously suppressed messages
                 record.msg = '{msg}{linesep}... {num} additional messages suppressed'.format(
-                    msg=record.msg,
+                    msg=record.getMessage(),
                     linesep=os.linesep,
                     num=bucket.limited
                 )
@@ -93,26 +93,25 @@ class RateLimitingFilter(logging.Filter):
     def _get_substr_bucket(self, record):
         # Locate the relevant token bucket by matching the configured substrings against the message
         for substr in self._substr_buckets:
-            if substr in record.msg:
+            if substr in record.getMessage():
                 return self._substr_buckets[substr]
 
         return None  # None indicates no filtering
 
     def _get_auto_bucket(self, record):
-        if record.msg in self._auto_buckets:
+        if record.getMessage() in self._auto_buckets:
             # We have an exact match - there is a bucket configured for this message
-            return self._auto_buckets[record.msg]
+            return self._auto_buckets[record.getMessage()]
 
         # Check whether we have a partial match - whether part of the message
         # matches against a token bucket we previously created for a similar message
         for msg, bucket in self._auto_buckets.items():
-            matcher = difflib.SequenceMatcher(None, msg, record.msg)
+            matcher = difflib.SequenceMatcher(None, msg, record.getMessage())
             if matcher.ratio() >= 0.75:  # Might want to make the ratio threshold configurable?
                 return bucket
 
         # No match, so create a new bucket for this message
-        return self._auto_buckets[record.msg]
-
+        return self._auto_buckets[record.getMessage()]
 
 class TokenBucket(object):
     """An implementation of the Token Bucket algorithm."""
