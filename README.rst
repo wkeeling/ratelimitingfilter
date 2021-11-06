@@ -7,7 +7,7 @@ RateLimitingFilter
 .. image:: https://codecov.io/gh/wkeeling/ratelimitingfilter/branch/master/graph/badge.svg
         :target: https://codecov.io/gh/wkeeling/ratelimitingfilter
 
-.. image:: https://img.shields.io/badge/python-2.7%2C%203.4%2C%203.5%2C%203.6%2C%203.7-blue.svg
+.. image:: https://img.shields.io/badge/python-2.7%2C%203.4%2C%203.5%2C%203.6%2C%203.7%2C%203.8%2C%203.9-blue.svg
         :target: https://pypi.python.org/pypi/ratelimitingfilter
 
 .. image:: https://img.shields.io/pypi/v/ratelimitingfilter.svg
