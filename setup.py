@@ -28,5 +28,5 @@ setup(
     test_suite='tests',
     tests_require=['mock'],
     url='https://github.com/wkeeling/ratelimitingfilter',
-    version='1.4',
+    version='1.5',
 )
