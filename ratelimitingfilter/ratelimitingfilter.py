@@ -75,6 +75,7 @@ class RateLimitingFilter(logging.Filter):
                     linesep=os.linesep,
                     num=bucket.limited
                 )
+                record.args = ()
             bucket.limited = 0
             return True
 
