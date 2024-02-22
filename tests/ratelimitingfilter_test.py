@@ -3,7 +3,10 @@ from __future__ import division
 import logging
 import os
 from unittest.case import TestCase
-from mock import Mock, patch
+try:
+    from unittest.mock import Mock, patch
+except ImportError:
+    from mock import Mock, patch
 
 from ratelimitingfilter import RateLimitingFilter
 

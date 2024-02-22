@@ -1,4 +1,11 @@
 from setuptools import setup
+from sys import version_info
+
+if version_info.major < 3 or \
+  (version_info.major == 3 and version_info.minor < 4):
+    tests_require=['mock']
+else:
+    tests_require=[]
 
 setup(
     author='Will Keeling',
@@ -26,7 +33,7 @@ setup(
     name='ratelimitingfilter',
     packages=['ratelimitingfilter'],
     test_suite='tests',
-    tests_require=['mock'],
+    tests_require=tests_require,
     url='https://github.com/wkeeling/ratelimitingfilter',
     version='1.5',
 )
